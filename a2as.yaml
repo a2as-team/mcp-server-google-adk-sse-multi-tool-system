@@ -1,0 +1,834 @@
+manifest:
+  version: "0.1.3"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: ammilam/mcp-server-google-adk-sse-multi-tool-system
+    source: https://github.com/ammilam/mcp-server-google-adk-sse-multi-tool-system
+    branch: main
+    commit: "28920671"
+    scope: [mcp_agent/main.py, mcp_agent/mcp_agent/__init__.py, mcp_agent/mcp_agent/agent.py, mcp_agent/mcp_agent/mcp_toolkit.py,
+      mcp_agent/mcp_agent/setup.py, mcp_agent/mcp_agent/tools.py, mcp_agent/setup.py]
+  issued:
+    by: A2AS.org
+    at: '2026-02-11T16:43:42Z'
+    url: https://a2as.org/certified/agents/ammilam/mcp-server-google-adk-sse-multi-tool-system
+  signatures:
+    digest: sha256:8tqRWShzHcdaGLeQeCvnsFaEIXCY8unIQtQj9iZR3NI
+    key: ed25519:shLSzGbSXyVDXPN72qInPPTkhlI_t7Ize6qMiC_jWz8
+    sig: ed25519:jF3ME-FksA59KYdkeE_1ZTPce26alwjABLtr4rcukvT6bEyvEGi-qKPDZJ3Op7zgF-LjwoobEH0hXSiLSSYmDw
+
+agents:
+  api_agent:
+    type: instance
+    models: [gemini-2.5-flash]
+    tools: [mcp_call_api, mcp_get_weather]
+    params:
+      name: ApiAgent
+      instruction: [You're a specialist in API Calls, 'You can help with:', '- Making API calls to external services', '-
+          Fetching weather data for locations', '- Calling APIs with GET, POST, PUT, DELETE methods', '- Handling API responses
+          and errors', 'You can make API calls using the following tools:', '- mcp_call_api: Make API calls to external services',
+        '- mcp_get_weather: Get current weather conditions for a location']
+  cloud_engineer_agent:
+    type: instance
+    models: [gemini-2.5-flash]
+    tools: [mcp_clone_repository, mcp_list_repositories, mcp_git, mcp_analyze_repository, mcp_generate_readme, debug_gitlab_job,
+      mcp_terraform_fmt, mcp_write_terraform_file, mcp_create_feature_branch, mcp_terraform_add_resource, mcp_read_file, mcp_write_file,
+      mcp_list_files, mcp_delete_file, mcp_find_files, mcp_ensure_file_path]
+    params:
+      name: CloudEngineerAgent
+      instruction: ['You are a specialist in Google Cloud Platform, CICD, Gitlab, and Terraform.', 'You can help with:', '-
+          Analyzing GitLab CI/CD job failures', '- Debugging and fixing issues in GitLab pipelines', '- Writing and formatting
+          Terraform code', '- Creating and managing feature branches in Git repositories', '- Cloning and analyzing code repositories',
+        '- Generating documentation for code repositories', '- Writing Terraform files for infrastructure as code', '- Adding
+          new resources to existing Terraform configurations', '- Ensuring proper formatting and structure in Terraform files',
+        '- Creating feature branches for new infrastructure changes', '- Pushing changes to Git repositories', '- Analyzing
+          code repositories for best practices and improvements', '- Debugging GitLab job failures by analyzing job trace
+          logs', '- Providing tailored advice for infrastructure, cloud deployments, and application builds', '- Suggesting
+          specific solutions based on actual errors in your logs', '- Explaining why the job failed and how to fix it in detail',
+        '- Cloning down the repository and analyzing the code to provide more context', '- Writing Terraform code for GCP
+          resources like BigQuery datasets, Cloud Storage buckets, etc.', '- Using lowercase when styling commit messages,
+          e.g., fix: fix variable misconfiguration', '- Creating feature branches using conventional branch names using lowercase
+          characters and dashes ''-'' prefixed with: feat/ fix/ chore/ test/ ci/ docs/']
+  coding_agent:
+    type: instance
+    models: [gemini-2.0-flash]
+    params:
+      name: CodeAgent
+      instruction: [You're a specialist in Code Execution, 'You can help with:', '- Executing code snippets', '- Running code
+          to solve programming problems', '- Debugging code issues', '- Analyzing code for correctness', '- Providing code
+          examples and explanations']
+      code_executor: BuiltInCodeExecutor
+  filesystem_agent:
+    type: instance
+    models: [gemini-2.5-flash]
+    tools: [mcp_read_file, mcp_write_file, mcp_list_files, mcp_delete_file, mcp_find_files, mcp_ensure_file_path]
+    params:
+      name: FileSystemAgent
+      instruction: [You're a specialist in File System Operations, 'You can help with:', '- Reading files from the file system',
+        '- Writing files to the file system', '- Listing files in directories', '- Deleting files from the file system', '-
+          Finding files in the file system', '- Ensuring file paths exist', 'You can perform file operations using the following
+          tools:', '- mcp_read_file: Read the contents of a file', '- mcp_write_file: Write data to a file', '- mcp_list_files:
+          List files in a directory', '- mcp_delete_file: Delete a file', '- mcp_find_files: Find files matching a pattern',
+        '- mcp_ensure_file_path: Ensure a file path exists']
+  root_agent:
+    type: instance
+    models: [gemini-2.5-flash]
+    tools: [search_agent, coding_agent, filesystem_agent, api_agent, session_agent, cloud_engineer_agent]
+    params:
+      name: mcp_agent
+      description: Agent that can handle weather, time, and interact with a Model Control Protocol server
+      instruction: [You can help with various tasks through your integration with an MCP server., 'You can do the following:',
+        '- Get current time in different cities', '- Check weather conditions in locations', '- Read, write, list, and delete
+          files', '- Make API calls to external services', '- Store and retrieve data in a session (text, numbers, or boolean
+          values)', '- Clone and analyze code repositories from GitHub or GitLab', '- Generate documentation for code repositories',
+        '- Debug and analyze GitLab CI/CD job failures', '- Use agent tools for interacting with tools and the MCP server',
+        '- Help with google cloud platform, CICD, Gitlab, and Terraform tasks', '- Search google for documentation on various
+          topics', 'When you ask me about files, I''ll use the appropriate file operation tools.', 'When you ask me about
+          weather, I''ll look up the latest conditions.', 'When you want to store information for later, I''ll use session
+          storage.', 'For API calls:', '- I''ll need a complete URL (e.g., "api.example.com/endpoint" or "http://api.example.com/endpoint")',
+        '- I need to know which HTTP method to use (GET, POST, PUT, DELETE)', '- For POST/PUT requests, I''ll need the data
+          to send', '- I''ll always ask you to confirm details before making potentially sensitive API calls', 'For repository
+          operations:', '- I can clone repositories from GitHub or GitLab', '- I can analyze repositories and generate documentation',
+        '- I can list all cloned repositories', 'For example, you can ask me to:', '- "Clone the repository at github.com/username/repo-name"',
+        '- "Analyze the code from the repository I just cloned"', '- "Generate a README for the repository"', 'When you ask
+          me about GitLab job failures, I can:', '- Analyze job trace logs from GitLab.com or any self-hosted GitLab instance',
+        '- Identify failure patterns and root causes across various technologies', '- Provide tailored advice for infrastructure,
+          cloud deployments, and application builds', '- Suggest specific solutions based on the actual errors in your logs',
+        '- Explain why the job failed and how to fix it in detail', '- Clone down the repository and analyze the code to provide
+          more context', 'For example, you can ask me:', '- "Debug this GitLab job: https://gitlab.com/group/project/-/jobs/123456"',
+        '- "What''s wrong with this pipeline job: https://gitlab.example.com/group/project/-/jobs/123456"', '- "Help me fix
+          the failures in this self-hosted GitLab job: https://gitlab.internal.company.com/group/project/-/jobs/123456"',
+        'For repository operations:', '- I can clone repositories from GitHub or GitLab', '- I can analyze repositories and
+          generate documentation', '- I can list all cloned repositories', '- I can create feature branches, make commits,
+          and push changes', '- I can write and format Terraform code for infrastructure as code', '- Use lowercase when styling
+          commit messages, e.g., fix: fix variable misconfiguration', 'For Terraform operations:', '- I can create Terraform
+          files with proper formatting in the appropriate directories', '- I can analyze existing Terraform code to understand
+          your infrastructure', '- I can run terraform commands like init, plan, apply, validate, and terraform fmt --recursive',
+        '- I can help create resources that reference existing infrastructure', '- I can suggest improvements to your infrastructure
+          code', '- I can add new Terraform resources to existing repositories and commit the changes', 'For example, you
+          can ask me to:', '- "Find all Terraform files in my repository"', '- "Create a feature branch for adding a new BigQuery
+          dataset"', '- "Write Terraform code for a GCP BigQuery dataset"', '- "Format the Terraform code in my repository"',
+        '- "Commit my changes with a descriptive message"', '- "Push my feature branch to GitHub"', '- "Add a google_project
+          resource to my repository and commit the changes"']
+  search_agent:
+    type: instance
+    models: [gemini-2.0-flash]
+    tools: [google_search]
+    params:
+      name: SearchAgent
+      instruction: [You're a specialist in Google Search]
+  session_agent:
+    type: instance
+    models: [gemini-2.5-flash]
+    tools: [mcp_store_data, mcp_store_number, mcp_store_boolean, mcp_retrieve_data]
+    params:
+      name: SessionAgent
+      instruction: [You're a specialist in Session Storage, 'You can help with:', '- Storing and retrieving text data', '-
+          Storing and retrieving numbers', '- Storing and retrieving boolean values', '- Managing session data for later use',
+        'You can store data in the session using the following tools:', '- mcp_store_data: Store text data', '- mcp_store_number:
+          Store a number', '- mcp_store_boolean: Store a boolean value', '- mcp_retrieve_data: Retrieve stored data', 'You
+          can retrieve data from the session using the following tool:', '- mcp_retrieve_data: Retrieve stored data']
+
+models:
+  gemini-2.0-flash:
+    type: literal
+    agents: [search_agent, coding_agent]
+  gemini-2.5-flash:
+    type: literal
+    agents: [filesystem_agent, api_agent, session_agent, cloud_engineer_agent, root_agent]
+
+tools:
+  api_agent:
+    type: agent
+    agents: [root_agent]
+    params:
+      wrapper: AgentTool
+      agent: api_agent
+  BuiltInCodeExecutor:
+    type: module
+    params:
+      class: BuiltInCodeExecutor
+  cloud_engineer_agent:
+    type: agent
+    agents: [root_agent]
+    params:
+      wrapper: AgentTool
+      agent: cloud_engineer_agent
+  coding_agent:
+    type: agent
+    agents: [root_agent]
+    params:
+      wrapper: AgentTool
+      agent: coding_agent
+  debug_gitlab_job:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: Debug a GitLab job using the MCP debug tool
+  filesystem_agent:
+    type: agent
+    agents: [root_agent]
+    params:
+      wrapper: AgentTool
+      agent: filesystem_agent
+  google_search:
+    type: module
+    agents: [search_agent]
+  mcp_analyze_repository:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: "Analyzes a repository and provides information about its structure and contents.\n\nArgs:\n    repo_path:\
+        \ Path to the repository (should be the name or relative path within the repos directory)\n    \nReturns:\n    dict:\
+        \ A dictionary with status and repository analysis information"
+  mcp_call_api:
+    type: function
+    agents: [api_agent]
+    params:
+      description: "Makes an API call through the MCP server.\n\nArgs:\n    endpoint: The URL to call (with or without http://\
+        \ prefix)\n    method: HTTP method (GET, POST, PUT, DELETE)\n    data: Optional data to send with the request\n  \
+        \  headers: Optional headers to include in the request\n    \nReturns:\n    dict: A dictionary with status ('success'\
+        \ or 'error') and response data or error message"
+  mcp_clone_repository:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: "Clones a GitHub or GitLab repository.\n\nArgs:\n    url: Repository URL (GitHub or GitLab)\n    \nReturns:\n\
+        \    dict: A dictionary with status and either repository path or error message"
+  mcp_create_feature_branch:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: |-
+        Creates a new feature branch in a repository.
+
+        This is a convenience function that creates a properly named feature branch
+        following git flow conventions (feature/name-of-feature).
+
+        Args:
+            repo_path: Path to the repository
+            feature_name: Name of the feature (will be sanitized for branch naming)
+
+        Returns:
+            dict: A dictionary with status information
+  mcp_delete_file:
+    type: function
+    agents: [filesystem_agent, cloud_engineer_agent]
+    params:
+      description: "Deletes a file from the file system.\n\nArgs:\n    file_path: Path to the file to delete\n    \nReturns:\n\
+        \    dict: A dictionary with status ('success' or 'error') and possibly an error message"
+  mcp_ensure_file_path:
+    type: function
+    agents: [filesystem_agent, cloud_engineer_agent]
+    params:
+      description: |-
+        Ensures a file path exists or suggests an appropriate one.
+
+        This tool helps find the correct location for a file in a repository.
+        If the file exists, it returns its path. If not, it suggests a suitable
+        location based on common conventions and repository structure.
+
+        Args:
+            repo_path: Path to the repository
+            file_path: Tentative file path to check or create
+            file_type: Type of file (e.g., 'terraform', 'python', 'config')
+
+        Returns:
+            dict: Information about the file path
+  mcp_find_files:
+    type: function
+    agents: [filesystem_agent, cloud_engineer_agent]
+    params:
+      description: "Find files in a repository matching a pattern.\n\nThis tool searches through a cloned repository and finds\
+        \ files that match \nthe specified pattern. It's useful when you need to locate specific files\nbut don't know their\
+        \ exact location in the repository.\n\nArgs:\n    repo_path: Path to the repository (should be the name or relative\
+        \ path within the repos directory)\n    file_pattern: File pattern to search for (e.g., \"*.tf\", \"main.py\", etc.)\n\
+        \nReturns:\n    dict: A dictionary with matching files and related information"
+  mcp_generate_readme:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: "Generates a README document for a repository.\n\nArgs:\n    repo_path: Path to the repository (should\
+        \ be the name or relative path within the repos directory)\n    \nReturns:\n    dict: A dictionary with status and\
+        \ generated README content"
+  mcp_get_weather:
+    type: function
+    agents: [api_agent]
+    params:
+      description: "Gets weather information for a specified location.\n\nArgs:\n    location: The location to get weather\
+        \ for\n    \nReturns:\n    dict: A dictionary with status ('success' or 'error') and either weather report or error\
+        \ message"
+  mcp_git:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: |-
+        Performs Git operations on a repository.
+
+        This tool allows creating branches, committing changes, pushing to remote repositories,
+        and other Git operations on cloned repositories.
+
+        Args:
+            operation: The Git operation to perform ('create_branch', 'checkout_branch', 'commit', 'push', 'status', 'pull')
+            repo_path: Path to the repository (should be the name or relative path within the repos directory)
+            **kwargs: Additional arguments depending on the operation:
+                - branch: Branch name for branch operations
+                - message: Commit message for commit operations
+                - files: List of files to commit (optional, commits all changes if not specified)
+                - credentials: Dict with 'token' or 'username'/'password' for push operations
+
+        Returns:
+            dict: A dictionary with status information and operation results
+  mcp_list_files:
+    type: function
+    agents: [filesystem_agent, cloud_engineer_agent]
+    params:
+      description: "Lists files in a directory.\n\nArgs:\n    directory_path: Path to the directory to list\n    \nReturns:\n\
+        \    dict: A dictionary with status ('success' or 'error') and either file list or error message"
+  mcp_list_repositories:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: |-
+        Lists available repositories.
+
+        Returns:
+            dict: A dictionary with status and list of repositories
+  mcp_read_file:
+    type: function
+    agents: [filesystem_agent, cloud_engineer_agent]
+    params:
+      description: "Reads a file from the file system.\n\nArgs:\n    file_path: Path to the file to read\n    \nReturns:\n\
+        \    dict: A dictionary with status ('success' or 'error') and either file content or error message"
+  mcp_retrieve_data:
+    type: function
+    agents: [session_agent]
+    params:
+      description: "Retrieves data from the current session.\n\nArgs:\n    key: The key to retrieve data for\n    \nReturns:\n\
+        \    dict: A dictionary with status ('success' or 'error') and either the retrieved value or an error message"
+  mcp_store_boolean:
+    type: function
+    agents: [session_agent]
+    params:
+      description: "Stores a boolean value in the current session.\n\nArgs:\n    key: The key to store the data under\n  \
+        \  value: The boolean value to store\n    \nReturns:\n    dict: A dictionary with status information"
+  mcp_store_data:
+    type: function
+    agents: [session_agent]
+    params:
+      description: "Stores data in the current session.\n\nArgs:\n    key: The key to store the data under\n    value: The\
+        \ value to store (as a string)\n    \nReturns:\n    dict: A dictionary with status ('success' or 'error') and possibly\
+        \ an error message"
+  mcp_store_number:
+    type: function
+    agents: [session_agent]
+    params:
+      description: "Stores a number in the current session.\n\nArgs:\n    key: The key to store the data under\n    value:\
+        \ The numeric value to store\n    \nReturns:\n    dict: A dictionary with status information"
+  mcp_terraform_add_resource:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: "Adds a new Terraform resource to a repository and commits the changes.\n\nThis function creates or modifies\
+        \ a Terraform file in the appropriate directory\nof a repository, adds a new resource of the specified type, and commits\
+        \ the changes.\n\nArgs:\n    repo_path: Path to the repository (name or path)\n    resource_type: Type of Terraform\
+        \ resource to create (e.g., 'google_project')\n    resource_name: Name for the resource (e.g., 'my_project')\n   \
+        \ attributes: Dictionary of attributes for the resource\n    branch_name: Optional branch name to create for the changes\n\
+        \    commit_message: Optional commit message (default: generate appropriate message)\n    file_name: Optional specific\
+        \ file name to create or modify\n    \nReturns:\n    dict: Status information about the operation"
+  mcp_terraform_fmt:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: |-
+        Formats Terraform code using terraform fmt.
+
+        This is a convenience function that calls terraform fmt with recursive option
+        to format all Terraform files in the directory tree.
+
+        Args:
+            working_dir: Directory containing Terraform code
+            recursive: Whether to recursively format subdirectories
+
+        Returns:
+            dict: A dictionary with status information and command output
+  mcp_write_file:
+    type: function
+    agents: [filesystem_agent, cloud_engineer_agent]
+    params:
+      description: "Writes content to a file.\n\nArgs:\n    file_path: Path where to write the file\n    content: Content\
+        \ to write to the file\n    \nReturns:\n    dict: A dictionary with status ('success' or 'error') and possibly an\
+        \ error message"
+  mcp_write_terraform_file:
+    type: function
+    agents: [cloud_engineer_agent]
+    params:
+      description: |-
+        Writes a Terraform file and automatically formats it.
+
+        This enhanced function will attempt to find the correct location for Terraform files
+        if the specified path doesn't exist or isn't accessible.
+
+        Args:
+            file_path: Path to the Terraform file to write
+            content: Terraform configuration content
+            auto_find_path: Whether to automatically find an appropriate path if the specified one doesn't work
+
+        Returns:
+            dict: A dictionary with status information
+  search_agent:
+    type: agent
+    agents: [root_agent]
+    params:
+      wrapper: AgentTool
+      agent: search_agent
+  session_agent:
+    type: agent
+    agents: [root_agent]
+    params:
+      wrapper: AgentTool
+      agent: session_agent
+
+imports:
+  _get_toolkit_internal: mcp_toolkit.get_toolkit
+  Agent: google.adk.agents.Agent
+  agent_tool: google.adk.tools.agent_tool
+  Any: typing.Any
+  BaseModel: pydantic.BaseModel
+  BuiltInCodeExecutor: google.adk.code_executors.BuiltInCodeExecutor
+  Callable: typing.Callable
+  CORSMiddleware: fastapi.middleware.cors.CORSMiddleware
+  create_oauth_flow: mcp_agent.oauth_utils.create_oauth_flow
+  debug_gitlab_job: tools.debug_gitlab_job
+  Depends: fastapi.Depends
+  Dict: typing.Dict
+  exchange_code_for_token: mcp_agent.oauth_utils.exchange_code_for_token
+  FastAPI: fastapi.FastAPI
+  find_packages: setuptools.find_packages
+  get_fast_api_app: google.adk.cli.fast_api.get_fast_api_app
+  get_toolkit: mcp_toolkit.get_toolkit
+  get_user_info: mcp_agent.oauth_utils.get_user_info
+  google_search: google.adk.tools.google_search
+  HTTPException: fastapi.HTTPException
+  is_oauth_enabled: mcp_agent.oauth_utils.is_oauth_enabled
+  json: json
+  JSONResponse: fastapi.responses.JSONResponse
+  List: typing.List
+  load_dotenv: dotenv.load_dotenv
+  logging: logging
+  mcp_analyze_repository: tools.mcp_analyze_repository
+  mcp_call_api: tools.mcp_call_api
+  mcp_clone_repository: tools.mcp_clone_repository
+  mcp_create_feature_branch: tools.mcp_create_feature_branch
+  mcp_delete_file: tools.mcp_delete_file
+  mcp_ensure_file_path: tools.mcp_ensure_file_path
+  mcp_find_files: tools.mcp_find_files
+  mcp_generate_readme: tools.mcp_generate_readme
+  mcp_get_weather: tools.mcp_get_weather
+  mcp_git: tools.mcp_git
+  mcp_list_files: tools.mcp_list_files
+  mcp_list_repositories: tools.mcp_list_repositories
+  mcp_read_file: tools.mcp_read_file
+  mcp_retrieve_data: tools.mcp_retrieve_data
+  mcp_store_boolean: tools.mcp_store_boolean
+  mcp_store_data: tools.mcp_store_data
+  mcp_store_number: tools.mcp_store_number
+  mcp_terraform: tools.mcp_terraform
+  mcp_terraform_add_resource: tools.mcp_terraform_add_resource
+  mcp_terraform_fmt: tools.mcp_terraform_fmt
+  mcp_write_file: tools.mcp_write_file
+  mcp_write_terraform_file: tools.mcp_write_terraform_file
+  Optional: typing.Optional
+  os: os
+  Query: fastapi.Query
+  re: re
+  RedirectResponse: fastapi.responses.RedirectResponse
+  Request: fastapi.Request
+  requests: requests
+  root_agent: agent.agent
+  secrets: secrets
+  setup: setuptools.setup
+  sseclient: sseclient
+  threading: threading
+  time: time
+  uuid: uuid
+  uvicorn: uvicorn
+
+functions:
+  __init__:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, mcp_server_url]
+  _clean_repo_path:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [repo_path]
+    params:
+      returns: str
+  _sse_worker:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, callback_function]
+  analyze_repository:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, repo_path]
+    params:
+      returns: Dict
+  call_api:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, endpoint, method, data, headers]
+    params:
+      returns: Dict
+  clone_repository:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, url]
+    params:
+      returns: Dict
+  custom_status:
+    type: async
+    module: mcp_agent.main
+  debug_gitlab_job:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, job_id, project_id, job_url]
+    params:
+      returns: Dict
+  delete_file:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, file_path]
+    params:
+      returns: Dict
+  execute_tool:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, tool_name, parameters]
+    params:
+      returns: Dict
+  format_terraform_resource:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [resource_type, resource_name, attributes]
+    params:
+      returns: str
+  format_terraform_value:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [value]
+    params:
+      returns: str
+  generate_readme:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, repo_path]
+    params:
+      returns: Dict
+  get_session_data:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, key]
+    params:
+      returns: Dict
+  get_toolkit:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    params:
+      returns: MCPToolkit
+  get_toolkit_with_retry:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [max_retries, retry_delay]
+  get_weather:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, location]
+    params:
+      returns: Dict
+  git_operation:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, operation, repo_path]
+    params:
+      returns: Dict
+  health_check:
+    type: async
+    module: mcp_agent.mcp_agent.main
+  initialize_session:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self]
+    params:
+      returns: str
+  list_files:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, directory_path]
+    params:
+      returns: Dict
+  list_repositories:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self]
+    params:
+      returns: Dict
+  mcp_analyze_repository:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [repo_path]
+    params:
+      returns: dict
+  mcp_call_api:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [endpoint, method, data, headers]
+    params:
+      returns: dict
+  mcp_clone_repository:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [url]
+    params:
+      returns: dict
+  mcp_create_feature_branch:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [repo_path, feature_name]
+    params:
+      returns: dict
+  mcp_delete_file:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [file_path]
+    params:
+      returns: dict
+  mcp_ensure_file_path:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [repo_path, file_path, file_type]
+    params:
+      returns: dict
+  mcp_find_files:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [repo_path, file_pattern]
+    params:
+      returns: dict
+  mcp_generate_readme:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [repo_path]
+    params:
+      returns: dict
+  mcp_get_weather:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [location]
+    params:
+      returns: dict
+  mcp_git:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [operation, repo_path]
+    params:
+      returns: dict
+  mcp_list_files:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [directory_path]
+    params:
+      returns: dict
+  mcp_list_repositories:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    params:
+      returns: dict
+  mcp_read_file:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [file_path]
+    params:
+      returns: dict
+  mcp_retrieve_data:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [key]
+    params:
+      returns: dict
+  mcp_store_boolean:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [key, value]
+    params:
+      returns: dict
+  mcp_store_data:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [key, value]
+    params:
+      returns: dict
+  mcp_store_number:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [key, value]
+    params:
+      returns: dict
+  mcp_terraform:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [operation, working_dir, options, auto_approve, variables]
+    params:
+      returns: dict
+  mcp_terraform_add_resource:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [repo_path, resource_type, resource_name, attributes, branch_name, commit_message, file_name]
+    params:
+      returns: dict
+  mcp_terraform_fmt:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [working_dir, recursive]
+    params:
+      returns: dict
+  mcp_write_file:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [file_path, content]
+    params:
+      returns: dict
+  mcp_write_terraform_file:
+    type: sync
+    module: mcp_agent.mcp_agent.tools
+    args: [file_path, content, auto_find_path]
+    params:
+      returns: dict
+  oauth_callback:
+    type: async
+    module: mcp_agent.main
+    args: [request, state, code, error]
+  oauth_login:
+    type: async
+    module: mcp_agent.main
+    args: [request]
+  oauth_logout:
+    type: async
+    module: mcp_agent.main
+  oauth_status:
+    type: async
+    module: mcp_agent.main
+  read_file:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, file_path, encoding]
+    params:
+      returns: Dict
+  reconnect_session:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, session_id]
+    params:
+      returns: bool
+  register_event_callback:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, event_type, callback_function]
+  root:
+    type: async
+    module: mcp_agent.main
+  send_prompt:
+    type: async
+    module: mcp_agent.main
+    args: [request]
+  set_session_data:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, data]
+    params:
+      returns: Dict
+  sse_callback:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [event_data]
+  start_sse_listener:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, callback_function]
+  startup_event:
+    type: async
+    module: mcp_agent.mcp_agent.main
+  stop_sse_listener:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self]
+  terraform_operation:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, operation, working_dir]
+    params:
+      returns: Dict
+  write_file:
+    type: sync
+    module: mcp_agent.mcp_agent.mcp_toolkit
+    args: [self, file_path, content, encoding]
+    params:
+      returns: Dict
+
+variables:
+  ALLOWED_ORIGINS:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [mcp_agent.main, mcp_agent.mcp_agent.main]
+  MCP_SERVER_URL:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [mcp_agent.mcp_agent.mcp_toolkit]
+  PORT:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [mcp_agent.main, mcp_agent.mcp_agent.main]
+  SESSION_DB_URL:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [mcp_agent.main, mcp_agent.mcp_agent.main]
+
+files:
+  file_name:
+    type: pattern
+    actions: [read]
+    params:
+      caller: [os.path.join]
+      pattern: [relative_dir, file_name]
+  file_path:
+    type: pattern
+    actions: [read]
+    params:
+      caller: [os.path.join]
+      pattern: [repo_path, file_path]
+  new_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [os.path.dirname, os.path.basename]
+  relative_path:
+    type: pattern
+    actions: [read]
+    params:
+      caller: [os.path.join]
+      pattern: [repo_full_path, relative_path]
+  target_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [os.path.basename]
+  target_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [os.path.dirname, os.path.basename]
